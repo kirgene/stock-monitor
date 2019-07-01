@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no">
+  <title>Stock Prices</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+  <script>
+    $(() => { (async () => {
+      const PRICE_URL = 'ws://localhost:8000/latest-prices';
+      const STOCK_URL = 'http://localhost:8000/stocks';
+
+      const stocks = [];
+
+      await fetch(STOCK_URL)
+        .then(response => response.json())
+        .then(({data}) => data.forEach(d => stocks.push(d)));
+
+      const data = [];
+
+      function createChart(data) {
+        return new CanvasJS.Chart("chartContainer", {
+          title: {
+            text: "Stock Prices"
+          },
+          axisX: {
+            valueFormatString: "DD-MM-YYYY HH:mm:ss"
+          },
+          axisY2: {
+            title: "Price",
+            prefix: "$",
+          },
+          toolTip: {
+            shared: true
+          },
+          legend: {
+            cursor: "pointer",
+            verticalAlign: "top",
+            horizontalAlign: "center",
+            dockInsidePlotArea: true,
+            itemclick: toogleDataSeries
+          },
+          data,
+        });
+      }
+
+      const chart = createChart(data);
+
+      function toogleDataSeries(e){
+        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+          e.dataSeries.visible = false;
+        } else{
+          e.dataSeries.visible = true;
+        }
+        chart.render();
+      }
+
+      const webSocket = new WebSocket(PRICE_URL);
+
+      webSocket.onopen = () => {
+        console.log('Connection opened.');
+        const urlParams = new URLSearchParams(window.location.search);
+        let name;
+        try {
+          name = JSON.parse(urlParams.get('name'));
+        } catch (e) {
+
+        }
+        if (name) {
+          const msg = {
+            type: 'subscribe',
+            name,
+          };
+          console.log(msg);
+          webSocket.send(JSON.stringify(msg));
+        } else {
+          alert('"name" param should be a JSON array, example:\nname=["ABC", "ASD"]');
+        }
+      };
+
+      webSocket.onmessage = (event) => {
+        if (event.errors) {
+          console.log(event.errors);
+          alert(event.errors);
+          return;
+        }
+        const price = JSON.parse(event.data);
+        const item = data.find(d => d.symbol === price.symbol);
+        if (!item) {
+          const stock = stocks.find(s => s.symbol === price.symbol);
+          data.push({
+            type:"line",
+            axisYType: "secondary",
+            name: stock.name,
+            symbol: stock.symbol,
+            showInLegend: true,
+            markerSize: 0,
+            yValueFormatString: "$#,###k",
+            dataPoints: [
+              { x: new Date(price.time), y: price.price },
+            ]
+          });
+        } else if (item.dataPoints.length < 6) {
+          item.dataPoints.push({ x: new Date(price.time), y: price.price })
+        }
+        chart.render();
+      };
+
+      webSocket.onclose = function() {
+        console.log('Connection closed.');
+      };
+    })();
+    });
+  </script>
+</head>
+<body>
+<div id="chartContainer" style="height: 500px; width: 100%;"></div>
+</body>
+</html>

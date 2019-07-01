@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+   db:
+     image: postgres:11
+     volumes:
+       - db_data:/var/lib/postgresql/data
+     restart: always
+     environment:
+       POSTGRES_DB: test_db
+       POSTGRES_USER: test_user
+       POSTGRES_PASSWORD: test_pass
+
+   api:
+     depends_on:
+       - db
+     build: .
+     #image: stock-monitor:latest
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       DB_HOST: db
+       DB_USER: test_user
+       DB_PASSWORD: test_pass
+       DB_NAME: test_db
+       VERSION: 1.0
+       PORT: 80
+       DEBUG: 'false'
+       PROVIDER: IEX
+volumes:
+    db_data: {}
