@@ -14,9 +14,7 @@ import {
 } from './validation';
 
 import {
-  // Use this as a replacement for express.Request
   ValidatedRequest,
-  // Creates a validator that generates middlewares
   createValidator,
 } from 'express-joi-validation';
 
