@@ -4,6 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no">
   <title>Stock Prices</title>
+  <style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      margin: auto;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
   <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
@@ -100,6 +123,7 @@
         const prices = await fetch(`${PRICE_URL}?${urlParams}`)
           .then(response => response.json());
         prices.data.forEach(price => addPrice(price));
+        $('#spinner').hide();
         chart.render();
       }
 
@@ -130,6 +154,7 @@
           const stockPrice = msg.data;
           // console.log(stockPrice);
           addPrice(stockPrice);
+          $('#spinner').hide();
           chart.render();
         };
 
@@ -151,6 +176,7 @@
   </script>
 </head>
 <body>
+<div id="spinner" class="loader"></div>
 <div id="chartContainer" style="height: 500px; width: 100%;"></div>
 </body>
 </html>
