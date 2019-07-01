@@ -7,7 +7,7 @@ There are two ways to run server: as a Docker container (simplest) or locally in
 ### Features
 - Fetch ticker prices from third-party service in realtime
 - Cache requested data
-- Execute queries on cached data 
+- Execute queries on historical data
 - Supported data providers: IEX 
  
 
@@ -201,22 +201,31 @@ http://localhost:8000
 * **Response:**
 
   Refer to `Response` section of `List Stocks Prices` API.
+---
 
-* **Demo:**
+***Demo***
+----
+* Show latest prices for single company:
 
-    * Show latest prices for single company:
+  ```
+  http://localhost:8000/demo/?name=["baba"]
+  ```
 
-      `http://localhost:8000/demo/?name=["baba"]`
+* Show latest prices for multiple companies:
 
-    * Show latest prices for multiple companies:
+  ```
+  http://localhost:8000/demo/?name=["baba", "v"]
+  ```
 
-      `http://localhost:8000/demo/?name=["baba", "v"]`
+* Show prices for a given time range (from 12:00 to 18:10 of March 20, 2019):
 
-    * Show prices for a given time range (from 12:00 to 18:10 of March 20, 2019):
+  ```
+  http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00
+  ```
 
-      `http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00`
+* Show prices for a given time range with high ($180.5) and low ($180) price filter:
 
-    * Show prices for a given time range with high ($180.5) and low ($180) price filter:
-
-      `http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00&low=180&high=180.5`
+  ```
+  http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00&low=180&high=180.5
+  ```
  -----
