@@ -9,10 +9,12 @@
   <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
   <script>
     $(() => { (async () => {
-      const PRICE_URL = 'ws://localhost:8000/latest-prices';
+      const LATEST_PRICE_URL = 'ws://localhost:8000/latest-prices';
+      const PRICE_URL = 'http://localhost:8000/prices';
       const STOCK_URL = 'http://localhost:8000/stocks';
 
       const stocks = [];
+      const urlParams = new URLSearchParams(window.location.search);
 
       await fetch(STOCK_URL)
         .then(response => response.json())
@@ -53,6 +55,15 @@
         });
       }
 
+      function getNameParam() {
+        let name;
+        try {
+          name = JSON.parse(urlParams.get('name'));
+        } catch (e) {
+        }
+        return name;
+      }
+
       const chart = createChart(data);
 
       function toogleDataSeries(e){
@@ -64,38 +75,7 @@
         chart.render();
       }
 
-      const webSocket = new WebSocket(PRICE_URL);
-
-      webSocket.onopen = () => {
-        console.log('Connection opened.');
-        const urlParams = new URLSearchParams(window.location.search);
-        let name;
-        try {
-          name = JSON.parse(urlParams.get('name'));
-        } catch (e) {
-
-        }
-        if (name) {
-          const msg = {
-            type: 'subscribe',
-            name,
-          };
-          console.log(msg);
-          webSocket.send(JSON.stringify(msg));
-        } else {
-          alert('"name" param should be a JSON array, example:\nname=["ABC", "ASD"]');
-        }
-      };
-
-      webSocket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.errors) {
-          console.log(event.errors);
-          alert(event.errors);
-          return;
-        }
-        const stockPrice = msg.data;
-        console.log(stockPrice);
+      function addPrice(stockPrice) {
         const item = data.find(d => d.symbol === stockPrice.symbol);
         if (!item) {
           const stock = stocks.find(s => s.symbol === stockPrice.symbol);
@@ -114,12 +94,58 @@
         } else {
           item.dataPoints.push({ x: new Date(stockPrice.time), y: stockPrice.price })
         }
-        chart.render();
-      };
+      }
 
-      webSocket.onclose = function() {
-        console.log('Connection closed.');
-      };
+      async function createHistory() {
+        const prices = await fetch(`${PRICE_URL}?${urlParams}`)
+          .then(response => response.json());
+        prices.data.forEach(price => addPrice(price));
+        chart.render();
+      }
+
+      function createRealtime() {
+        const webSocket = new WebSocket(LATEST_PRICE_URL);
+        webSocket.onopen = () => {
+          console.log('Connection opened.');
+          const name = getNameParam();
+          if (name) {
+            const msg = {
+              type: 'subscribe',
+              name,
+            };
+            // console.log(msg);
+            webSocket.send(JSON.stringify(msg));
+          } else {
+            alert('"name" param should be a JSON array, example:\nname=["ABC", "ASD"]');
+          }
+        };
+
+        webSocket.onmessage = (event) => {
+          const msg = JSON.parse(event.data);
+          if (msg.errors) {
+            console.log(event.errors);
+            alert(event.errors);
+            return;
+          }
+          const stockPrice = msg.data;
+          // console.log(stockPrice);
+          addPrice(stockPrice);
+          chart.render();
+        };
+
+        webSocket.onclose = function() {
+          console.log('Connection closed.');
+        };
+      }
+
+      const start = urlParams.get('start');
+      const end = urlParams.get('end');
+      if (start && end) {
+        await createHistory();
+      } else {
+        createRealtime();
+      }
+
     })();
     });
   </script>

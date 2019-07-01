@@ -204,7 +204,19 @@ http://localhost:8000
 
 * **Demo:**
 
-  `http://localhost:8000/demo/?name=["baba"]`
-<br>
-  `http://localhost:8000/demo/?name=["baba", "v"]`
+    * Show latest prices for single company:
+
+      `http://localhost:8000/demo/?name=["baba"]`
+
+    * Show latest prices for multiple companies:
+
+      `http://localhost:8000/demo/?name=["baba", "v"]`
+
+    * Show prices for a given time range (from 12:00 to 18:10 of March 20, 2019):
+
+      `http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00`
+
+    * Show prices for a given time range with high ($180.5) and low ($180) price filter:
+
+      `http://localhost:8000/demo/?name=["BABA"]&start=2019-03-20T12:00:00&end=2019-03-20T18:10:00&low=180&high=180.5`
  -----

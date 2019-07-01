@@ -10,7 +10,7 @@ export const PriceFilterSchema = Joi.object({
   start: Joi.date().iso(),
   end: Joi.date().iso(),
   high: Joi.number().positive(),
-  low: Joi.number().positive().less(Joi.ref('high')),
+  low: Joi.number().positive(),
   name: Joi.array().items(Joi.string()),
 }).with('start', 'end');
 

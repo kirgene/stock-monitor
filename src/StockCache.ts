@@ -173,7 +173,7 @@ export class StockCache {
     } else if (filter.high) {
       query.andWhere('price', '<', filter.high * 1e4);
     } else if (filter.low) {
-      query.andWhere('price', '>', filter.high * 1e4);
+      query.andWhere('price', '>', filter.low * 1e4);
     }
     if (filter.name) {
       query.andWhere((builder) => this.applyNameQueryFilter(builder, filter.name));
