@@ -34,7 +34,13 @@
             includeZero: false
           },
           toolTip: {
-            shared: true
+            contentFormatter: (e) => {
+              let content = '';
+              for (var i = 0; i < e.entries.length; i++) {
+                content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm:ss.fff DD.MM.YYYY");
+              }
+              return content;
+            }
           },
           legend: {
             cursor: "pointer",
@@ -100,7 +106,7 @@
             symbol: stock.symbol,
             showInLegend: true,
             markerSize: 0,
-            yValueFormatString: "$#,###k",
+            yValueFormatString: "$#.####",
             dataPoints: [
               { x: new Date(stockPrice.time), y: stockPrice.price },
             ]
