@@ -8,6 +8,10 @@ import * as PcapParser from 'pcap-ng-parser';
 import * as zlib from 'zlib';
 import * as progressStream from 'progress-stream';
 import logger from '../../logger';
+import * as lockfile from 'lockfile';
+import {createHash} from 'crypto';
+import * as os from 'os';
+import * as path from 'path';
 
 type StockPriceCallback = (stockPrice: IEXStockPrice[]) => Promise<void>;
 
@@ -41,6 +45,19 @@ async function _getStockPricesHistoryFromURL(url: string, callback: StockPriceCa
 export async function getStockPricesHistoryFromURL(url: string) {
   if (typeof url !== 'string') {
     throw new Error('data must be a string URL');
+  }
+
+  const urlHash = createHash('sha1').update(url).digest('hex');
+  const lockPath = path.join(os.tmpdir(), `IEXWorker-${urlHash}.lock`);
+  const locked = await new Promise(resolve =>
+    lockfile.lock(lockPath, error => error ? resolve(true) : resolve(false)));
+  if (locked) {
+    // URL is been processing by another worker, so wait for it
+    return new Promise((resolve, reject) =>
+      lockfile.lock(lockPath, {
+        wait: Infinity,
+        pollPeriod: 1000,
+      }, (error) => error ? reject() : resolve()));
   }
 
   let messageId = 0;

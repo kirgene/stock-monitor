@@ -11,7 +11,7 @@ RUN npm install \
 
 ####################################################
 
-FROM node:alpine
+FROM node:12.5-alpine
 
 WORKDIR /app
 
@@ -19,6 +19,7 @@ COPY --from=build /app/db db
 COPY --from=build /app/package.json .
 COPY --from=build /app/dist dist
 COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/public public
 
 ENV PORT 80
 

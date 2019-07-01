@@ -162,7 +162,7 @@ http://localhost:8000
   high |  float | List stocks with prices below this value (high water mark) | `150.40`, `600`
   low |  float | List stocks with prices above this value (low water mark) | `10.25`, `50`
    
- > NOTICE: specifying `start` and `end` params will lead to downloading historical data for a given time range and the amount of that data can be HUGE ( ~ 700 - 900 MB for a single day).<br>
+ > NOTICE: specifying `start` and `end` params on a fresh database will lead to downloading historical data for a given time range and the amount of that data can be HUGE ( ~ 700 - 900 MB for a single day).<br>
  The progress and estimated completion time of this processing are displayed in real-time in logs.
 
 * **Response:**
