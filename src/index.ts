@@ -46,7 +46,17 @@ app.use('/demo', express.static('public'));
 
 app.ws('/latest-prices', (ws, req) => {
   logger.debug('WS connection opened');
-  (ws as any).onStockData = (data: object) => ws.send(JSON.stringify(data));
+  (ws as any).onStockData = (msg: any) => {
+    if (!msg.errors) {
+      msg = {
+        data: {
+          ...msg,
+          time: new Date(msg.time).toISOString(),
+        },
+      };
+    }
+    ws.send(JSON.stringify(msg));
+  }
   ws.on('message', async (data: string) => {
     logger.debug(`received WS msg: ${data}`);
     const callback = (ws as any).onStockData;

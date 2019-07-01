@@ -134,7 +134,7 @@ export class IEX extends Provider {
       const result: StockPrice = {
         symbol: data.symbol.toUpperCase(),
         price: data.price,
-        time: new Date(data.time).getTime(),
+        time: data.time,
       };
       this.notifySubscribers(result.symbol, result);
     }

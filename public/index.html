@@ -31,6 +31,7 @@
           axisY2: {
             title: "Price",
             prefix: "$",
+            includeZero: false
           },
           toolTip: {
             shared: true
@@ -81,15 +82,17 @@
       };
 
       webSocket.onmessage = (event) => {
-        if (event.errors) {
+        const msg = JSON.parse(event.data);
+        if (msg.errors) {
           console.log(event.errors);
           alert(event.errors);
           return;
         }
-        const price = JSON.parse(event.data);
-        const item = data.find(d => d.symbol === price.symbol);
+        const stockPrice = msg.data;
+        console.log(stockPrice);
+        const item = data.find(d => d.symbol === stockPrice.symbol);
         if (!item) {
-          const stock = stocks.find(s => s.symbol === price.symbol);
+          const stock = stocks.find(s => s.symbol === stockPrice.symbol);
           data.push({
             type:"line",
             axisYType: "secondary",
@@ -99,11 +102,11 @@
             markerSize: 0,
             yValueFormatString: "$#,###k",
             dataPoints: [
-              { x: new Date(price.time), y: price.price },
+              { x: new Date(stockPrice.time), y: stockPrice.price },
             ]
           });
-        } else if (item.dataPoints.length < 6) {
-          item.dataPoints.push({ x: new Date(price.time), y: price.price })
+        } else {
+          item.dataPoints.push({ x: new Date(stockPrice.time), y: stockPrice.price })
         }
         chart.render();
       };
