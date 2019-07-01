@@ -203,5 +203,8 @@ http://localhost:8000
   Refer to `Response` section of `List Stocks Prices` API.
 
 * **Demo:**
-`http://localhost:8000/demo/?name=["intel*"]`
+
+  `http://localhost:8000/demo/?name=["baba"]`
+<br>
+  `http://localhost:8000/demo/?name=["baba", "v"]`
  -----
