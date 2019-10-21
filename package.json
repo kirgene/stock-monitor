@@ -29,7 +29,7 @@
     "express-ws": "^4.0.0",
     "faker": "^4.1.0",
     "joi-extract-type": "^15.0.0",
-    "knex": "^0.18.0",
+    "knex": "^0.19.5",
     "lockfile": "^1.0.4",
     "pcap-ng-parser": "^1.0.0",
     "pg": "^7.11.0",
